@@ -8,11 +8,11 @@
 
 import React, { Component } from 'react'
 import { Platform, StyleSheet, Text, View, Button, Alert } from 'react-native'
-import { NaverLogin } from 'react-native-naver-login'
+import { NaverLogin, getProfile } from 'react-native-naver-login'
 
 const initials = {
   kConsumerKey: 'nhvymxQWDv4Thz0XDscU',
-  kConsumerSecret: 'XXXXXXX',
+  kConsumerSecret: 'XXXXX',
   kServiceAppName: 'naverlogin',
   kServiceAppUrlScheme: 'naverurlschema' // only for iOS
 }
@@ -34,6 +34,22 @@ export default class App extends Component {
           title="naverlogin"
         />
         <Button onPress={() => NaverLogin.logout()} title="naverlogout" />
+        <Button
+          onPress={() =>
+            (getNaverProfile = async token => {
+              let result = null
+              try {
+                result = await getProfile(token)
+                console.log(result)
+              } catch (err) {
+                console.log('err')
+                console.log(err)
+              }
+              return result
+            })
+          }
+          title="profile"
+        />
       </View>
     )
   }
