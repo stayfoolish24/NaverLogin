@@ -17,39 +17,60 @@ const initials = {
   kServiceAppUrlScheme: 'naverurlschema' // only for iOS
 }
 
-export default class App extends Component {
+class App extends Component {
+  constructor(props) {
+    super(props)
+
+    console.log('\n\n Initial Page :: src/components/pages/First/index.js \n\n')
+
+    this.state = {
+      isNaverLoggingin: false,
+      theToken: 'token has not fetched'
+    }
+  }
+
+  // 로그인 후 내 프로필 가져오기.
+  async fetchProfile() {
+    const profileResult = await getProfile(this.state.theToken)
+    console.log(profileResult)
+    if (profileResult.resultcode === '024') {
+      Alert.alert('로그인 실패', profileResult.message)
+      return
+    }
+    Alert.alert('profile', JSON.stringify(profileResult))
+  }
+
+  // 네이버 로그인 시작.
+  async naverLoginStart() {
+    console.log('  naverLoginStart  ed')
+    NaverLogin.login(initials, (err, token) => {
+      console.log(`\n\n  Token is fetched  :: ${token} \n\n`)
+      this.setState({ theToken: token })
+      if (err) {
+        console.log(err)
+        return
+      }
+    })
+  }
+
   render() {
+    const { theToken } = this.state
     return (
       <View style={styles.container}>
-        <Button
-          onPress={() =>
-            NaverLogin.login(initials, (err, token) => {
-              if (err) {
-                Alert.alert('error', err)
-                return
-              }
-              Alert.alert('result', token)
-            })
-          }
-          title="naverlogin"
-        />
-        <Button onPress={() => NaverLogin.logout()} title="naverlogout" />
-        <Button
-          onPress={() =>
-            (getNaverProfile = async token => {
-              let result = null
-              try {
-                result = await getProfile(token)
-                console.log(result)
-              } catch (err) {
-                console.log('err')
-                console.log(err)
-              }
-              return result
-            })
-          }
-          title="profile"
-        />
+        <View style={styles.content}>
+          <Button
+            isLoading={this.state.isNaverLoggingin}
+            onPress={() => this.naverLoginStart()}
+            title="NAVER LOGIN"
+          />
+          <Text>{theToken}</Text>
+          <Button
+            isLoading={this.state.isNaverLoggingin}
+            onPress={() => this.fetchProfile()}
+            title="Fetch Profile"
+          />
+          <Button onPress={() => NaverLogin.logout()} title="naverlogout" />
+        </View>
       </View>
     )
   }
@@ -73,3 +94,5 @@ const styles = StyleSheet.create({
     marginBottom: 5
   }
 })
+
+export default App
